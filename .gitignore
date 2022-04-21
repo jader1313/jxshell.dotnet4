@@ -1,3 +1,11 @@
 .vs 
 **/obj/**
 **/bin/**
+/packages
+/tests/VFP/FOXUSER.FPT
+/tests/VFP/FOXUSER.DBF
+/tests/VFP/testevfp.exe
+/tests/VFP/program1.FXP
+/tests/VFP/program1.BAK
+/tests/VFP/jxshell.FXP
+/tests/VFP/jxshell.BAK

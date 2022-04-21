@@ -9,7 +9,7 @@ namespace jxshell.register
     {
         static void Main(string[] args)
         {
-            jxshell.net4.SelfRegister.Register(typeof(jxshell.net4.Manager));
+            jxshell.dotnet4.SelfRegister.Register(typeof(jxshell.dotnet4.Manager));
         }
     }
 }

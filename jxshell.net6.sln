@@ -2,9 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jxshell.net4", "src\jxshell.net4\jxshell.net4.csproj", "{0C9CE768-B4AE-4A20-9918-64C9732EFD26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jxshell.dotnet4", "src\jxshell.dotnet4\jxshell.dotnet4.csproj", "{0C9CE768-B4AE-4A20-9918-64C9732EFD26}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jxshellbase", "src\jxshellbase\jxshellbase.csproj", "{609D2E56-CA67-45F2-9BD5-2636BE8BD17A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jxshell.base", "src\jxshell.base\jxshell.base.csproj", "{609D2E56-CA67-45F2-9BD5-2636BE8BD17A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jxshell.register", "src\jxshell.register\jxshell.register.csproj", "{9BE4744A-C415-41A6-B634-33E1D9C2DB75}"
 EndProject
@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{642F362E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D0B0F983-2057-4452-B3B9-327D14F63C7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jxshell.dotnet4.test", "tests\jxshell.dotnet4.test\jxshell.dotnet4.test.csproj", "{09B59F1E-B8B6-49B3-8BA9-3B681BDD9C3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jxshell.tests", "tests\jxshell.tests\jxshell.tests.csproj", "{C066A725-8887-4EAB-8AB0-4D6E4D323220}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,10 +32,10 @@ Global
 		{9BE4744A-C415-41A6-B634-33E1D9C2DB75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BE4744A-C415-41A6-B634-33E1D9C2DB75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BE4744A-C415-41A6-B634-33E1D9C2DB75}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09B59F1E-B8B6-49B3-8BA9-3B681BDD9C3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09B59F1E-B8B6-49B3-8BA9-3B681BDD9C3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09B59F1E-B8B6-49B3-8BA9-3B681BDD9C3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09B59F1E-B8B6-49B3-8BA9-3B681BDD9C3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C066A725-8887-4EAB-8AB0-4D6E4D323220}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C066A725-8887-4EAB-8AB0-4D6E4D323220}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C066A725-8887-4EAB-8AB0-4D6E4D323220}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C066A725-8887-4EAB-8AB0-4D6E4D323220}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,7 +44,7 @@ Global
 		{0C9CE768-B4AE-4A20-9918-64C9732EFD26} = {D0B0F983-2057-4452-B3B9-327D14F63C7F}
 		{609D2E56-CA67-45F2-9BD5-2636BE8BD17A} = {D0B0F983-2057-4452-B3B9-327D14F63C7F}
 		{9BE4744A-C415-41A6-B634-33E1D9C2DB75} = {D0B0F983-2057-4452-B3B9-327D14F63C7F}
-		{09B59F1E-B8B6-49B3-8BA9-3B681BDD9C3C} = {642F362E-D4C8-4039-98D7-9A56C14296E3}
+		{C066A725-8887-4EAB-8AB0-4D6E4D323220} = {642F362E-D4C8-4039-98D7-9A56C14296E3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2303BAD2-2C1C-4329-A6A0-BD69D9C40801}
