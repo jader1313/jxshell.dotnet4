@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace jxshell
 {
-	public class language
+    public class language
 	{
 		public static Dictionary<string, languageEngine> languages;
 

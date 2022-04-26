@@ -7,6 +7,7 @@ using System.Text;
 namespace jxshell.dotnet4
 {
     [ComVisible(true)]
+    [Guid("11E6B86D-E9A3-42B1-A8ED-FC483A2DB768")]
     public class VFPHelper
     {
         public VFPHelper(typeDescriptor typeD)

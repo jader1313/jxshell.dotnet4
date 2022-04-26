@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 namespace jxshell.dotnet4
 {
 	[ComVisible(true)]
+	[Guid("637E53B3-6CC9-4756-9230-ED0B83F552F5")]
 	public class methodDescriptor : memberDescriptor
 	{
 		public List<MethodBase> baseMethods = new List<MethodBase>();

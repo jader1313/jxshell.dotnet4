@@ -4,7 +4,8 @@ using System.Runtime.InteropServices;
 namespace jxshell.dotnet4
 {
 	[ComVisible(true)]
-	public class delegateWrapper : wrapper
+    [Guid("13ED0900-57B3-4949-BCCC-0C1E84B8E565")]
+    public class delegateWrapper : wrapper
 	{
 		public object __internalTarget;
         public bool disposed;

@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 namespace jxshell.dotnet4
 {
 	[ComVisible(true)]
+	[Guid("777CFACD-E934-4B77-96FC-BDC33A056BF1")]
 	public class wrapperBase
 	{
 		public Type wrappedType;

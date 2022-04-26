@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 namespace jxshell.dotnet4
 {
 	[ComVisible(true)]
+	[Guid("9F05B4A5-DA5B-44CA-82E6-8DF938A28257")]
 	public class fieldDescriptor : memberDescriptor
 	{
 		public FieldInfo fieldInfo;

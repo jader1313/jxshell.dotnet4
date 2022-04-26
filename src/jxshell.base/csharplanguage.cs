@@ -1,21 +1,19 @@
-using System.Security.Cryptography;
-using Microsoft.CSharp;
-using System;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+//using Microsoft.CSharp;
+
 using System.CodeDom.Compiler;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.IO;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace jxshell
 {
-	public class csharplanguage : language
+    public class csharplanguage : language
 	{
-		private CSharpCodeProvider cp;
+		//private CSharpCodeProvider cSharpCodeProvider;
 
-		private CompilerParameters p = new CompilerParameters();
+		private CompilerParameters compilerParameters = new CompilerParameters();
 
 		public Assembly compiled = null;
 
@@ -41,66 +39,130 @@ namespace jxshell
 
 		public csharplanguage()
 		{
-			this.cp = new CSharpCodeProvider();
-			this.p.GenerateInMemory = false;
-			this.p.GenerateExecutable = false;
+			//this.cSharpCodeProvider = new CSharpCodeProvider();
+			this.compilerParameters.GenerateInMemory = false;
+			this.compilerParameters.GenerateExecutable = false;
 		}
 
 		public void compileString(string script, string file)
 		{
-			string[] location = new string[environment.assemblies.Count];
-			for (int i = 0; i < environment.assemblies.Count; i++)
+			string[] locations = CreateLocations(environment.assemblies);
+			this.compilerParameters.TreatWarningsAsErrors = false;
+			if (file != "")
 			{
-				if (environment.assemblies[i] == null)
+				this.compilerParameters.OutputAssembly = file;
+			}
+			this.compilerParameters.ReferencedAssemblies.AddRange(locations);
+			string scriptFileName = WriteScriptFile(script);
+			string scriptFileName2 = WriteScriptFile(this.sourceDefault);
+			//lock (this.cSharpCodeProvider)
+			{
+				this.compiled = CompileAssemblyFromFiles(scriptFileName, scriptFileName2, this.compilerParameters);
+			}
+		}
+
+		private static string[] CreateLocations(List<Assembly> assemblies)
+		{
+			string[] location = new string[assemblies.Count];
+			for (int i = 0; i < assemblies.Count; i++)
+			{
+				if (assemblies[i] == null)
 				{
 					throw new Exception("No se pudo cargar uno o más ensamblados.");
 				}
-				location[i] = environment.assemblies[i].Location;
+				location[i] = assemblies[i].Location;
 			}
-			this.p.TreatWarningsAsErrors = false;
-			if (file != "")
-			{
-				this.p.OutputAssembly = file;
-			}
-			this.p.ReferencedAssemblies.AddRange(location);
+
+			return location;
+		}
+
+		private static string WriteScriptFile(string script)
+		{
 			string str = string.Concat(Path.GetTempPath(), environment.uniqueId(), ".cs");
 			FileStream fileStream = new FileStream(str, FileMode.OpenOrCreate, FileAccess.Write);
 			StreamWriter streamWriter = new StreamWriter(fileStream);
 			streamWriter.Write(script);
 			streamWriter.Close();
 			fileStream.Close();
-			string str1 = string.Concat(Path.GetTempPath(), environment.uniqueId(), ".cs");
-			fileStream = new FileStream(str1, FileMode.OpenOrCreate, FileAccess.Write);
-			streamWriter = new StreamWriter(fileStream);
-			streamWriter.Write(this.sourceDefault);
-			streamWriter.Close();
-			fileStream.Close();
-			lock (this.cp)
+			return str;
+		}
+
+        private Assembly CompileAssemblyFromFiles(string scriptFileName, string scriptFileName2, CompilerParameters compilerParameters)
+        {
+            CompileAssemblyFromFile(compilerParameters, scriptFileName);
+            return Assembly.LoadFile(compilerParameters.OutputAssembly);
+        }
+
+		private void CompileAssemblyFromFile(CompilerParameters compilerParameters, string scriptFileName)
+		{
+            //var syntaxTree = SyntaxFactory.ParseSyntaxTree(SourceText.From(scriptFileName));
+            string sourceCode = File.ReadAllText(scriptFileName);
+            var syntaxTree = CSharpSyntaxTree.ParseText(sourceCode);
+
+            var runtimeDirectoryPath = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
+			var runtimeDirectory = Directory.GetParent(runtimeDirectoryPath);
+
+			var compilationOptions = new CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary)
+				.WithPlatform(Platform.X86);
+			var references = CreateReferences(compilerParameters);
+
+			var dllFileName = Guid.NewGuid().ToString() + ".dll";
+			var compilation = CSharpCompilation.Create(dllFileName)
+				.WithOptions(compilationOptions)
+				.AddReferences(references)
+				.AddSyntaxTrees(syntaxTree);
+
+			var result = compilation.Emit(compilerParameters.OutputAssembly);
+			if (!result.Success)
 			{
-				CompilerResults compilerResult = this.cp.CompileAssemblyFromFile(this.p, new string[] { str, str1 });
-				if (compilerResult.Errors.Count > 0)
+				StringBuilder stringBuilder = new StringBuilder();
+				foreach (Diagnostic codeIssue in result.Diagnostics)
 				{
-					StringBuilder stringBuilder = new StringBuilder();
-					if (!compilerResult.Errors[0].IsWarning)
-					{
-						stringBuilder.Append(compilerResult.Errors[0].ErrorText);
-					}
-					for (int j = 1; j < compilerResult.Errors.Count; j++)
-					{
-						if (!compilerResult.Errors[j].IsWarning)
-						{
-							stringBuilder.AppendLine();
-							stringBuilder.Append(compilerResult.Errors[j].ErrorText);
-						}
-					}
-					if (stringBuilder.Length > 0)
-					{
-						throw new Exception(stringBuilder.ToString());
-					}
+					string issue = $"ID: {codeIssue.Id}, Message: {codeIssue.GetMessage()}, Location: { codeIssue.Location.GetLineSpan()}, Severity: { codeIssue.Severity}";
+					stringBuilder.AppendLine();
+					stringBuilder.Append(issue);
 				}
-				this.compiled = compilerResult.CompiledAssembly;
+				if (stringBuilder.Length > 0)
+				{
+					File.Delete(compilerParameters.OutputAssembly);
+					throw new Exception(stringBuilder.ToString());
+				}
 			}
 		}
+
+
+		//		MetadataReference.CreateFromFile(typeof(Object).Assembly.Location),
+		//		MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location),
+		//		MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
+		//		MetadataReference.CreateFromFile(runtimeDirectory.FullName + Path.DirectorySeparatorChar + "mscorlib.dll"),
+		//		MetadataReference.CreateFromFile(runtimeDirectory.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll")
+		//		)
+
+		public static MetadataReference[] CreateReferences(CompilerParameters options)
+		{
+			var path = Environment.CurrentDirectory;
+			//var jxshellFileName = @"C:\Projetos\DotNet\Desenvolvimento\VFP\jxshell.dotnet4.fork\src\jxshell.dotnet4\bin\Debug\net6.0\jxshell.dotnet4.dll";
+			var path2 = Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location);
+			var runtimeVersion = System.Runtime.InteropServices.RuntimeEnvironment.GetSystemVersion();
+			var runtimeDirectoryPath = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
+			var pathSystemCoreLib = typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location;
+			var pathSystemRunTime = Path.Combine(runtimeDirectoryPath, "System.Runtime.dll");
+			var refPaths = new[]
+            {
+				//typeof(Enumerable).Assembly.Location,
+				//"jxshell.dotnet4.dll",
+				//jxshellFileName,
+				pathSystemRunTime,
+				typeof(Console).GetTypeInfo().Assembly.Location,
+				typeof(object).GetTypeInfo().Assembly.Location
+			};
+			var quantidadeAssembliesPadrao = refPaths.Length;
+
+			Array.Resize(ref refPaths, quantidadeAssembliesPadrao + options.ReferencedAssemblies.Count);
+            options.ReferencedAssemblies.CopyTo(refPaths, quantidadeAssembliesPadrao);
+			var references = refPaths.Select(r => MetadataReference.CreateFromFile(r)).ToArray();
+			return references;
+        }
 
 		public override Assembly getCompiledAssembly()
 		{
@@ -109,7 +171,7 @@ namespace jxshell
 
 		public CompilerParameters getCompilerParameters()
 		{
-			return this.p;
+			return this.compilerParameters;
 		}
 
 		public override void loadClass(string file)
@@ -152,10 +214,10 @@ namespace jxshell
 				string str2 = string.Concat(str1, "/", fileName, ".cache");
 				string end = "";
 				environment.mkDir(str1);
-				if (File.Exists(str2))
+				if (System.IO.File.Exists(str2))
 				{
-					DateTime lastWriteTime = File.GetLastWriteTime(str2);
-					if (File.GetLastWriteTime(file) <= lastWriteTime)
+					DateTime lastWriteTime = System.IO.File.GetLastWriteTime(str2);
+					if (System.IO.File.GetLastWriteTime(file) <= lastWriteTime)
 					{
 						FileStream fileStream = new FileStream(str2, FileMode.Open, FileAccess.Read);
 						StreamReader streamReader = new StreamReader(fileStream);
@@ -259,7 +321,7 @@ namespace jxshell
 		public override void runScriptWithId(string script, string id)
 		{
 			Type type = null;
-			string file  = environment.getCompilationFile(id);
+			string file = environment.getCompilationFile(id); 
 			var f = new FileInfo(file);
 			bool compile= true;
 			if(f.Exists){
@@ -273,7 +335,7 @@ namespace jxshell
 				
 			}
 			if(compile){
-				this.p.GenerateInMemory = false;
+				this.compilerParameters.GenerateInMemory = false;
 				this.compileString(script, file);
 				type = this.compiled.GetType("program");
 			}
@@ -286,7 +348,7 @@ namespace jxshell
 		public void runScript(string script, bool inMemory)
 		{
 			
-			this.p.GenerateInMemory = inMemory;
+			this.compilerParameters.GenerateInMemory = inMemory;
 			this.compileString(script, (inMemory ? "" : environment.getCompilationFile()));
 			Type type = this.compiled.GetType("program");
 			if(type != null){

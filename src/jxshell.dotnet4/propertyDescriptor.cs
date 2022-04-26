@@ -7,6 +7,7 @@ using System.Text;
 namespace jxshell.dotnet4
 {
 	[ComVisible(true)]
+	[Guid("29D1448E-B51C-46C6-BA7E-790DF967AF56")]
 	public class propertyDescriptor : memberDescriptor
 	{
 		public List<PropertyInfo> properties = new List<PropertyInfo>();

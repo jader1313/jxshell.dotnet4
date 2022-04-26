@@ -12,6 +12,7 @@
 	</PropertyGroup>
 	
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
@@ -25,7 +26,12 @@
   </ItemGroup>
 	
   <ItemGroup>
-    <ProjectReference Include="..\..\src\jxshell.dotnet4\jxshell.dotnet4.csproj" />
+    <Reference Include="jxshell.base">
+      <HintPath>..\..\src\jxshell.dotnet4\bin\Debug\net6.0\jxshell.base.dll</HintPath>
+    </Reference>
+    <Reference Include="jxshell.dotnet4">
+      <HintPath>..\..\src\jxshell.dotnet4\bin\Debug\net6.0\jxshell.dotnet4.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

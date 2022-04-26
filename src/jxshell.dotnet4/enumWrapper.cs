@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 namespace jxshell.dotnet4
 {
 	[ComVisible(true)]
+	[Guid("74D4A060-D765-4435-8E76-1B41E6C91F6C")]
 	public class enumWrapper : wrapper
 	{
 		public enumWrapper()

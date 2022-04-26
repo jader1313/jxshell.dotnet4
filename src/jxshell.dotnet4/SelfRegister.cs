@@ -1,9 +1,7 @@
 ﻿using Microsoft.Win32;
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace jxshell.dotnet4
 {
@@ -13,17 +11,24 @@ namespace jxshell.dotnet4
        public  static void Register(Type type)
         {
             string ProgID = type.FullName;
+            Console.WriteLine("ProgID: " + ProgID);
             string Version = type.Assembly.GetName().Version.ToString();
+            Console.WriteLine("Verion: " + Version);
             string GUIDstr = "{" + type.GUID.ToString() + "}";
+            Console.WriteLine("GUIDstr: " + GUIDstr);
             string keyPath = @"Software\Classes\";
+            Console.WriteLine("keyPath: " + keyPath);
 
 
             RegistryKey regularx86View = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry32);
 
             RegistryKey regularx64View = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
 
-            RegistryKey[] keys = {regularx86View.OpenSubKey(keyPath, RegistryKeyPermissionCheck.ReadWriteSubTree, System.Security.AccessControl.RegistryRights.FullControl),
-                    regularx64View.OpenSubKey(keyPath, RegistryKeyPermissionCheck.ReadWriteSubTree, System.Security.AccessControl.RegistryRights.FullControl)};
+            RegistryKey[] keys = 
+                {
+                    regularx86View.OpenSubKey(keyPath, RegistryKeyPermissionCheck.ReadWriteSubTree, System.Security.AccessControl.RegistryRights.FullControl),
+                    regularx64View.OpenSubKey(keyPath, RegistryKeyPermissionCheck.ReadWriteSubTree, System.Security.AccessControl.RegistryRights.FullControl)
+                };
 
 
             ProgIdAttribute[] attributes = (ProgIdAttribute[])type.GetCustomAttributes(typeof(ProgIdAttribute), false);
@@ -38,6 +43,8 @@ namespace jxshell.dotnet4
 
                 RegistryKey keyProgID = RootKey.CreateSubKey(ProgID);
                 keyProgID.SetValue(null, type.FullName);
+                Console.WriteLine("keyProgID: " + keyProgID);
+                Console.WriteLine("RootKey.Name: " + RootKey.Name);
 
                 //[HKEY_CURRENT_USER\Software\Classes\Prog.ID\CLSID]
                 //@="{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}"
@@ -77,7 +84,7 @@ namespace jxshell.dotnet4
                 //"Assembly"="AssemblyName, Version=1.0.0.0, Culture=neutral, PublicKeyToken=71c72075855a359a"
                 //"RuntimeVersion"="v4.0.30319"
                 //"CodeBase"="file:///Drive:/Full/Image/Path/file.dll"
-                SetInprocServer(InprocServer32.CreateSubKey("Version"), type, true);
+                SetInprocServer(InprocServer32.CreateSubKey(Version), type, true);
 
                 //[HKEY_CURRENT_USER\Software\Classes\CLSID\{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
                 keyCLSID.CreateSubKey(@"Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}");

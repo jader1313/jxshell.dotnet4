@@ -7,6 +7,7 @@ using System.Text;
 namespace jxshell.dotnet4
 {
     [ComVisible(true)]
+    [Guid("C9E52214-5AFB-4079-83A4-8582ABF4B3D6")]
     public class metaObject
     {
         public bool isstatic;

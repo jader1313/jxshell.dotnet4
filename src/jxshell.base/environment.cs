@@ -1,15 +1,10 @@
-using Microsoft.CSharp.RuntimeBinder;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace jxshell
 {
-	public class environment
+    public class environment
 	{
 		private static int uniqueId_;
 
@@ -147,7 +142,8 @@ namespace jxshell
 
 		public static string getCompilationFile(string id)
 		{
-			return string.Concat(environment.compilationPath, id, ".DLL");
+			var a = Path.Combine(environment.compilationPath, id);
+			return string.Concat(a, ".DLL");
 		}
 
 		public static string getDirectoryPathForUri(Uri u)
@@ -198,22 +194,22 @@ namespace jxshell
 			if (environment.windows)
 			{
 				//environment.environmentPath = string.Concat(environment.addBs(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System))), ".jxshell\\");
-				environment.environmentPath = string.Concat(Environment.GetEnvironmentVariable("USERPROFILE"), "/kodnet/");
+				environment.environmentPath = string.Concat(Environment.GetEnvironmentVariable("USERPROFILE"), @"\kodnet\");
 			}
 			else
 			{
-				environment.environmentPath = string.Concat(Environment.GetEnvironmentVariable("HOME"), "/kodnet/");
+				environment.environmentPath = string.Concat(Environment.GetEnvironmentVariable("HOME"), @"\kodnet\");
 			}
 			
 			var commonPath = string.Concat(environment.addBs(environment.environmentPath), "common");
-			environment.commonLibraryPath = string.Concat(environment.addBs(environment.environmentPath), "common/library/");
-			environment.commonApplicationsPath = string.Concat(environment.addBs(environment.environmentPath), "common/applications/");
-			environment.libraryPath = string.Concat(environment.environmentPath, "library/");
-			environment.appdataPath = string.Concat(environment.environmentPath, "appdata/");
-			environment.compilationPath = string.Concat(environment.environmentPath, "compilation/");
-			environment.applicationsPath = string.Concat(environment.environmentPath, "applications/");
-			environment.languagePath = string.Concat(environment.libraryPath, "lang/");
-			environment.globalAssemblyPath = string.Concat(environment.environmentPath, "global/");
+			environment.commonLibraryPath = string.Concat(environment.addBs(environment.environmentPath), @"common\library\");
+			environment.commonApplicationsPath = string.Concat(environment.addBs(environment.environmentPath), @"common\applications\");
+			environment.libraryPath = string.Concat(environment.environmentPath, @"library\");
+			environment.appdataPath = string.Concat(environment.environmentPath, @"appdata\");
+			environment.compilationPath = string.Concat(environment.environmentPath, @"compilation\");
+			environment.applicationsPath = string.Concat(environment.environmentPath, @"applications\");
+			environment.languagePath = string.Concat(environment.libraryPath, @"lang\");
+			environment.globalAssemblyPath = string.Concat(environment.environmentPath, @"global\");
 			
 			
 			environment.mkDir(environment.environmentPath);
@@ -227,7 +223,7 @@ namespace jxshell
 			{
 				environment.mkDir(environment.commonLibraryPath);
 			}
-			catch (Exception exception)
+			catch
 			{
 			}
 			environment.loadAssembly(Assembly.GetExecutingAssembly(), true);
@@ -339,7 +335,7 @@ namespace jxshell
 
 		public static void loadAssemblyPartialName(string name)
 		{
-			environment.loadAssembly(Assembly.LoadWithPartialName(name), true);
+			environment.loadAssembly(Assembly.Load(name), true);
 		}
 
 		public static string locateInGlobalPath(string file)

@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 namespace jxshell.dotnet4
 {
 	[ComVisible(true)]
+	[Guid("9A292F30-5C8A-4B57-B353-94CD20B5B46D")]
 	public class delegateWrapperStatic : wrapperStatic
 	{
 		public delegateWrapperStatic(Type t, typeDescriptor td) : base(t, td)

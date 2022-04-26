@@ -1,18 +1,18 @@
-using jxshell;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace jxshell.dotnet4
 {
-	[ComVisible(true)]
-	[Guid("9173A427-2F3B-405D-9B0F-23C7B7048114")]
-	[ProgId("jxshell.dotnet4.Manager")]
+    [ComVisible(true)]
+	//[Guid("9173A427-2F3B-405D-9B0F-23C7B7048114")]
+	//[ProgId("jxshell.dotnet4.Manager")]
+	[Guid("C4EED9EE-E334-44E5-8EB4-A5484C46AEC4")]
+	[ProgId("jxshell.dotnet4.Manager2")]
 	public class Manager : IDisposable
 	{
 		public static Manager lastManager;
@@ -114,7 +114,7 @@ namespace jxshell.dotnet4
 
 		public wrapperStatic getStaticWrapper(string typeName)
 		{
-			return wrapperStatic.loadFromType(this.getTypeOrGenericType(typeName));
+			return wrapperStatic.loadFromType(getTypeOrGenericType(typeName));
 		}
 
 		public wrapper getTypeFromObject(object o)
@@ -273,21 +273,21 @@ namespace jxshell.dotnet4
 
 		public void loadAssemblyPartialName(string name)
 		{
-			this.@add(Assembly.LoadWithPartialName(name));
+			this.@add(Assembly.Load(name));
 		}
 
 		public void loadManyTypes(string types)
 		{
 			string[] array = types.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
 			StringBuilder stringBuilder = new StringBuilder();
-			jxshell.dotnet4.typeDescriptor.addUsingsStatements(stringBuilder);
+			typeDescriptor.addUsingsStatements(stringBuilder);
 			Dictionary<Type, type_1> dictionary = new Dictionary<Type, type_1>();
 			string[] strArrays = array;
 			for (int i = 0; i < (int)strArrays.Length; i++)
 			{
 				string typeName = strArrays[i];
 				Type typeOrGenericType = this.getTypeOrGenericType(typeName);
-				jxshell.dotnet4.typeDescriptor typeDescriptor = new jxshell.dotnet4.typeDescriptor(typeOrGenericType, typeName, false);
+				typeDescriptor typeDescriptor = new typeDescriptor(typeOrGenericType, typeName, false);
 				if (!typeDescriptor.isCompiled())
 				{
 					string staticClass = "";
@@ -306,13 +306,13 @@ namespace jxshell.dotnet4
 			jxshell.csharplanguage csharplanguage = (jxshell.csharplanguage)language.defaultLanguage.create();
 			if (dictionary.Count > 0)
 			{
-				csharplanguage.runScript(stringBuilder.ToString(), jxshell.dotnet4.typeDescriptor.generateInMemory);
+				csharplanguage.runScript(stringBuilder.ToString(), typeDescriptor.generateInMemory);
 			}
 			foreach (KeyValuePair<Type, type_1> item in dictionary)
 			{
 				type_1 value = item.Value;
 				Type type = csharplanguage.getCompiledAssembly().GetType(string.Concat("jxshell.dotnet4.", value.staticClass));
-				ConstructorInfo constructor = type.GetConstructor(new Type[] { typeof(Type), typeof(jxshell.dotnet4.typeDescriptor) });
+				ConstructorInfo constructor = type.GetConstructor(new Type[] { typeof(Type), typeof(typeDescriptor) });
 				value.td.setCompiledWrapper((wrapperStatic)constructor.Invoke(new object[] { value.t, value.td }));
 			}
 		}
@@ -320,7 +320,7 @@ namespace jxshell.dotnet4
 		public void loadManyTypes(Type[] types)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			jxshell.dotnet4.typeDescriptor.addUsingsStatements(stringBuilder);
+			typeDescriptor.addUsingsStatements(stringBuilder);
 			Dictionary<Type, type_1> dictionary = new Dictionary<Type, type_1>();
 			Type[] typeArray = types;
 			for (int i = 0; i < (int)typeArray.Length; i++)
@@ -328,7 +328,7 @@ namespace jxshell.dotnet4
 				Type type = typeArray[i];
 				if (!type.IsGenericType && type.IsPublic)
 				{
-					jxshell.dotnet4.typeDescriptor typeDescriptor = new jxshell.dotnet4.typeDescriptor(type, jxshell.dotnet4.typeDescriptor.getNameForType(type), false);
+					typeDescriptor typeDescriptor = new typeDescriptor(type, typeDescriptor.getNameForType(type), false);
 					if (!typeDescriptor.isCompiled())
 					{
 						string staticClass = "";
@@ -348,13 +348,13 @@ namespace jxshell.dotnet4
 			jxshell.csharplanguage csharplanguage = (jxshell.csharplanguage)language.defaultLanguage.create();
 			if (dictionary.Count > 0)
 			{
-				csharplanguage.runScript(stringBuilder.ToString(), jxshell.dotnet4.typeDescriptor.generateInMemory);
+				csharplanguage.runScript(stringBuilder.ToString(), typeDescriptor.generateInMemory);
 			}
 			foreach (KeyValuePair<Type, type_1> item in dictionary)
 			{
 				type_1 value = item.Value;
 				Type type2 = csharplanguage.getCompiledAssembly().GetType(string.Concat("jxshell.dotnet4.", value.staticClass));
-				ConstructorInfo constructor = type2.GetConstructor(new Type[] { typeof(Type), typeof(jxshell.dotnet4.typeDescriptor) });
+				ConstructorInfo constructor = type2.GetConstructor(new Type[] { typeof(Type), typeof(typeDescriptor) });
 				value.td.setCompiledWrapper((wrapperStatic)constructor.Invoke(new object[] { value.t, value.td }));
 			}
 		}

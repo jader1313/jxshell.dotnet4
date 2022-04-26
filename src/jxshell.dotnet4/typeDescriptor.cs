@@ -1,15 +1,16 @@
-using System.IO;
-using System.Security.Cryptography;
-using jxshell;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
+using jxshell.dotnet4;
 
 namespace jxshell.dotnet4
 {
 	[ComVisible(true)]
+	[Guid("D52D042D-A8F1-4F44-AB8D-3437240A0A3C")]
 	public class typeDescriptor
 	{
 		public Dictionary<string, methodDescriptor> instanceMethods = new Dictionary<string, methodDescriptor>();
@@ -254,7 +255,7 @@ namespace jxshell.dotnet4
 			}
 			return cadena.ToString();
 		}
-			
+
 		public wrapperStatic compile()
 		{
 			wrapperStatic _wrapperStatic;
@@ -271,28 +272,47 @@ namespace jxshell.dotnet4
 					
 					if(f.Exists){
 						
-						string str = "C" + GetSHA1(type.AssemblyQualifiedName);
-						string str1 = "C" + GetSHA1(type.AssemblyQualifiedName) + "_static";
-			
-						Type _type = Assembly.LoadFile(file).GetType(string.Concat("jxshell.dotnet4.", str1));
-						ConstructorInfo _constructor = _type.GetConstructor(new Type[] { typeof(Type), typeof(typeDescriptor) });
-						
-						this.compiledWrapper = (wrapperStatic)_constructor.Invoke(new object[] { this.type, this });
+						string classe = "C" + GetSHA1(type.AssemblyQualifiedName);
+						string classeStatic = "C" + GetSHA1(type.AssemblyQualifiedName) + "_static";
+
+                        string nomeClasseStatic = string.Concat("jxshell.dotnet4.", classeStatic);
+                        Type _type = Assembly.LoadFile(file).GetType(nomeClasseStatic);
+						var typeofTypeDescriptor = typeof(typeDescriptor);
+						var types = new Type[] { typeof(System.Type), typeofTypeDescriptor };
+
+						ConstructorInfo[] info = _type.GetConstructors();
+						ConstructorInfo _constructor = info[0];
+						//ConstructorInfo _constructor = _type.GetConstructor(types);
+
+						var myThis = this;
+						var objects = new object[] { myThis.type, myThis };
+
+						var objetosStr = objects[0].ToString();
+						var construtorStr = _constructor.ToString();
+
+						this.compiledWrapper = (wrapperStatic)Activator.CreateInstance(_type, objects);
+						//this.compiledWrapper = (wrapperStatic)_constructor.Invoke(objects);
 						this.compiled = true;
 					}
 					else{
 						StringBuilder stringBuilder = new StringBuilder();
-						string str = "";
-						string str1 = "";
+						string classeStatic = "";
+						string classe = "";
 						typeDescriptor.addUsingsStatements(stringBuilder);
-						this.precompile(stringBuilder, ref str, ref str1);
+						this.precompile(stringBuilder, ref classeStatic, ref classe);
 						stringBuilder.AppendLine("class program{public static void main(){}}");
 					
 						csharplanguage _csharplanguage = typeDescriptor.language;
 						_csharplanguage.runScriptWithId(stringBuilder.ToString(), name);
-						
-						Type _type = _csharplanguage.getCompiledAssembly().GetType(string.Concat("jxshell.dotnet4.", str));
-						ConstructorInfo _constructor = _type.GetConstructor(new Type[] { typeof(Type), typeof(typeDescriptor) });
+
+                        string nomeClasse = string.Concat("jxshell.dotnet4.", classeStatic);
+                        Type _type = _csharplanguage.getCompiledAssembly().GetType(nomeClasse);
+						var types = new Type[] { typeof(Type), typeof(typeDescriptor) };
+
+						ConstructorInfo[] info = _type.GetConstructors();
+						ConstructorInfo _constructor = info[0];
+						//var construtor = _constructor.ToString();
+						//ConstructorInfo _constructor = _type.GetConstructor(types);
 						
 						this.compiledWrapper = (wrapperStatic)_constructor.Invoke(new object[] { this.type, this });
 						this.compiled = true;
@@ -484,9 +504,10 @@ namespace jxshell.dotnet4
 			//string str1 = string.Concat("_", environment.uniqueId());
 			string str = "C" + GetSHA1(type.AssemblyQualifiedName);
 			string str1 = "C" + GetSHA1(type.AssemblyQualifiedName) + "_static";
-			
+
 			sb.AppendLine();
 			sb.AppendLine("[ComVisible(true)]");
+			sb.Append("[Guid(\"").Append(Guid.NewGuid().ToString()).AppendLine("\")]");
 			sb.Append("public class ").Append(str1).Append(" : ");
 			if (typeof(MulticastDelegate).IsAssignableFrom(this.type.BaseType))
 			{
@@ -712,6 +733,7 @@ namespace jxshell.dotnet4
 			sb.AppendLine("}");
 			sb.AppendLine();
 			sb.AppendLine("[ComVisible(true)]");
+			sb.Append("[Guid(\"").Append(Guid.NewGuid().ToString()).AppendLine("\")]");
 			sb.Append("public class ").Append(str).Append(" : ");
 			if (this.type.IsEnum)
 			{

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "jxshell.dotnet4": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Projetos\\DotNet\\Desenvolvimento\\VFP\\jxshell.dotnet4.fork\\tests\\VFP\\testevfp.exe"
+    }
+  }
+}
