@@ -9,3 +9,7 @@
 /tests/VFP/program1.BAK
 /tests/VFP/jxshell.FXP
 /tests/VFP/jxshell.BAK
+/tests/VFP/*.BAK
+/tests/VFP/*.pdb
+/tests/VFP/*.fxp
+*.nettrace

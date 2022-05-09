@@ -1,8 +1,11 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-//using Microsoft.CSharp;
 
+using System;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -11,16 +14,10 @@ namespace jxshell
 {
     public class csharplanguage : language
 	{
-		//private CSharpCodeProvider cSharpCodeProvider;
-
 		private CompilerParameters compilerParameters = new CompilerParameters();
-
 		public Assembly compiled = null;
-
 		private string sourceDefault = "";
-
 		private static Dictionary<string, int> compilations;
-
 		private static Dictionary<string, Assembly> compileds;
 
 		public override string languageName
@@ -39,7 +36,6 @@ namespace jxshell
 
 		public csharplanguage()
 		{
-			//this.cSharpCodeProvider = new CSharpCodeProvider();
 			this.compilerParameters.GenerateInMemory = false;
 			this.compilerParameters.GenerateExecutable = false;
 		}
@@ -55,7 +51,6 @@ namespace jxshell
 			this.compilerParameters.ReferencedAssemblies.AddRange(locations);
 			string scriptFileName = WriteScriptFile(script);
 			string scriptFileName2 = WriteScriptFile(this.sourceDefault);
-			//lock (this.cSharpCodeProvider)
 			{
 				this.compiled = CompileAssemblyFromFiles(scriptFileName, scriptFileName2, this.compilerParameters);
 			}
@@ -95,7 +90,6 @@ namespace jxshell
 
 		private void CompileAssemblyFromFile(CompilerParameters compilerParameters, string scriptFileName)
 		{
-            //var syntaxTree = SyntaxFactory.ParseSyntaxTree(SourceText.From(scriptFileName));
             string sourceCode = File.ReadAllText(scriptFileName);
             var syntaxTree = CSharpSyntaxTree.ParseText(sourceCode);
 
@@ -106,7 +100,8 @@ namespace jxshell
 				.WithPlatform(Platform.X86);
 			var references = CreateReferences(compilerParameters);
 
-			var dllFileName = Guid.NewGuid().ToString() + ".dll";
+			var dllFileName = Path.GetFileNameWithoutExtension(compilerParameters.OutputAssembly) + ".dll";
+
 			var compilation = CSharpCompilation.Create(dllFileName)
 				.WithOptions(compilationOptions)
 				.AddReferences(references)
@@ -130,14 +125,6 @@ namespace jxshell
 			}
 		}
 
-
-		//		MetadataReference.CreateFromFile(typeof(Object).Assembly.Location),
-		//		MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location),
-		//		MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
-		//		MetadataReference.CreateFromFile(runtimeDirectory.FullName + Path.DirectorySeparatorChar + "mscorlib.dll"),
-		//		MetadataReference.CreateFromFile(runtimeDirectory.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll")
-		//		)
-
 		public static MetadataReference[] CreateReferences(CompilerParameters options)
 		{
 			var path = Environment.CurrentDirectory;
@@ -150,8 +137,6 @@ namespace jxshell
 			var refPaths = new[]
             {
 				//typeof(Enumerable).Assembly.Location,
-				//"jxshell.dotnet4.dll",
-				//jxshellFileName,
 				pathSystemRunTime,
 				typeof(Console).GetTypeInfo().Assembly.Location,
 				typeof(object).GetTypeInfo().Assembly.Location
@@ -295,7 +280,6 @@ namespace jxshell
 			MethodInfo method = type.GetMethod("main", new Type[0]);
 			method.Invoke(null, new object[0]);
 		}
-	
 		
 		public static string GetSHA1(String texto)
 		{
@@ -310,10 +294,8 @@ namespace jxshell
 			return cadena.ToString();
 		}
 		
-		
 		public override void runScript(string script)
 		{
-			
 			//string file = environment.getCompilationFile(GetSHA1(script));
 			runScriptWithId(script, "JIT-" + GetSHA1(script));
 		}
@@ -324,8 +306,8 @@ namespace jxshell
 			string file = environment.getCompilationFile(id); 
 			var f = new FileInfo(file);
 			bool compile= true;
-			if(f.Exists){
-				
+			if(f.Exists)
+			{
 				try{
 					this.compiled = Assembly.LoadFile(file);
 					type = this.compiled.GetType("program");	
@@ -347,7 +329,6 @@ namespace jxshell
 
 		public void runScript(string script, bool inMemory)
 		{
-			
 			this.compilerParameters.GenerateInMemory = inMemory;
 			this.compileString(script, (inMemory ? "" : environment.getCompilationFile()));
 			Type type = this.compiled.GetType("program");

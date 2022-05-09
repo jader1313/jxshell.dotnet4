@@ -23,7 +23,6 @@ namespace jxshell.tests
             manager.loadAssembly("System.Collections");
             manager.loadAssemblyFile(@"C:\Kodnet_Teste\Net6\Sinca.Integrador.Domain.dll");
             var arquivo = manager.getStaticWrapper("Sinca.Integrador.Domain.Arquivo");
-            //var arquivoDto = manager.getStaticWrapper("Sinca.Integrador.Domain.Retorno.ArquivoRecebidoDto");
             //var arquivoObject = arquivo.construct();
             //var arquivoObject.NomeArquivo = "Nome do arquivo";
 

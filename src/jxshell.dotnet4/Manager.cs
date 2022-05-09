@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Loader;
 using System.Text;
 
 namespace jxshell.dotnet4
@@ -227,10 +229,9 @@ namespace jxshell.dotnet4
 			}
 			this.loadAssembly(typeof(Console).Assembly);
 			this.loadAssembly(typeof(WebClient).Assembly);
-            this.loadAssembly(typeof(typeDescriptor).Assembly);
-            this.loadAssembly(typeof(jxshell.csharplanguage).Assembly);
-            
-        }
+			this.loadAssembly(typeof(typeDescriptor).Assembly);
+			this.loadAssembly(typeof(jxshell.csharplanguage).Assembly);
+		}
 
 		public void loadAssembly(string name)
 		{

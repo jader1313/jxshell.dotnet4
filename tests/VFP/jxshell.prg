@@ -1,3 +1,4 @@
+CLEAR 
 ON SHUTDOWN QUIT
 ON KEY LABEL ALT+F1 Quit
 SET DEFAULT TO "c:\projetos\dotnet\desenvolvimento\vfp\jxshell.dotnet4.fork\tests\vfp\"
@@ -9,33 +10,31 @@ SET DEFAULT TO "c:\projetos\dotnet\desenvolvimento\vfp\jxshell.dotnet4.fork\test
 *!*	MESSAGEBOX('jxshell - Após criar objeto')
 *!*	x.Init()
 
-nomeDll = "C:\Kodnet_Teste\Std2_0\Sinca.Integrador.Domain.dll"
-*nomeDll = "C:\Kodnet_Teste\Net6\Sinca.Integrador.Domain.dll"
+*nomeDll = "C:\Kodnet_Teste\Std2_0\Sinca.Integrador.Domain.dll"
+nomeDll = "C:\Kodnet_Teste\Net6\Sinca.Integrador.Domain.dll"
 
-MESSAGEBOX('Inicio : ' + nomeDll)
+? 'Inicio : ' + nomeDll
+*MESSAGEBOX('Inicio : ' + nomeDll)
 
 DO ("kodnet.prg")
-MESSAGEBOX('Após rodar kodnet')
+*MESSAGEBOX('Após rodar kodnet')
 
 _screen.kodnet.loadAssembly("System.Collections")
 _screen.kodnet.loadAssemblyFile(FULLPATH(nomeDll))
-MESSAGEBOX('Após carregar assemblies')
+*MESSAGEBOX('Após carregar assemblies')
 
-SET STEP ON 
-TYPE = _screen.kodnet.getTypeOrGenericType("Sinca.Integrador.Domain.Arquivo")
+*!*	SET STEP ON 
+*!*	TYPE = _screen.kodnet.getTypeOrGenericType("Sinca.Integrador.Domain.Arquivo")
 
 
 arquivoClass  = _screen.kodnet.getStaticWrapper("Sinca.Integrador.Domain.Arquivo")
 MESSAGEBOX('Após getStaticWrapper')
 
-SET STEP ON 
-arquivoObject = arquivoClass.construct()
-arquivoObject.NomeArquivo = "Nome do arquivo"
-? arquivoObject.NomeArquivo
+*SET STEP ON 
+arquivoObject = arquivoClass.construct("teste")
+arquivoObject.CaminhoArquivo = "Nome do arquivo"
+? arquivoObject.CaminhoArquivo
 ret = MESSAGEBOX('jxshell - Após executar'  )
-
-
-
 
 
 IF ret = 1

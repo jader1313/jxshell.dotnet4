@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Loader;
 using System.Security.Cryptography;
 using System.Text;
-using jxshell.dotnet4;
 
 namespace jxshell.dotnet4
 {
-	[ComVisible(true)]
+    [ComVisible(true)]
 	[Guid("D52D042D-A8F1-4F44-AB8D-3437240A0A3C")]
-	public class typeDescriptor
+	public class typeDescriptor 
 	{
 		public Dictionary<string, methodDescriptor> instanceMethods = new Dictionary<string, methodDescriptor>();
 
@@ -240,7 +240,7 @@ namespace jxshell.dotnet4
 			sb.AppendLine("using System;");
 			sb.AppendLine("using System.Runtime.InteropServices;");
 			sb.AppendLine("using System.Reflection;");
-			sb.AppendLine("using jxshell.dotnet4;");
+			//sb.AppendLine("using jxshell.dotnet4;");
 		}
 		
 		public static string GetSHA1(String texto)
@@ -263,60 +263,66 @@ namespace jxshell.dotnet4
 			{
 				
 				// generar un archivo  por cada tipo 
-				string name = GetSHA1(this.type.AssemblyQualifiedName).ToUpper();
-				string file = environment.getCompilationFile(name);
-				FileInfo f = new FileInfo(file);
+				string nameSHA1 = GetSHA1(this.type.AssemblyQualifiedName).ToUpper();
+				string fileName = environment.getCompilationFile(nameSHA1);
+				FileInfo f = new FileInfo(fileName);
 				
 				try
 				{
 					
 					if(f.Exists){
-						
-						string classe = "C" + GetSHA1(type.AssemblyQualifiedName);
-						string classeStatic = "C" + GetSHA1(type.AssemblyQualifiedName) + "_static";
+                        //Type typeClasseStatic = Type.GetType("jxshell.dotnet4.C1fa0fedcc79791dfe282331eaa2b3332cbb8db92_static, 1FA0FEDCC79791DFE282331EAA2B3332CBB8DB92.dll, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null");
+                        //var alcClasseStatic = AssemblyLoadContext.GetLoadContext(_type.GetType().Assembly);
+                        ////var executingAssembly = Assembly.GetExecutingAssembly();
+                        ////var currentDomainAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+                        ////var defaultContextAssemblies = AssemblyLoadContext.Default.Assemblies.ToList();
+                        ////var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                        ////var xxx = _type.AssemblyQualifiedName;
+                        ////var codeBase = this.GetType().Assembly.CodeBase;
+                        //var currentReflectionContext = AssemblyLoadContext.CurrentContextualReflectionContext;
+                        ////using(alcClasseStatic.EnterContextualReflection())
+                        ////ConstructorInfo[] info = _type.GetConstructors();
+                        ////ConstructorInfo _constructor = info[0];
+                        //var types = new Type[] { typeof(System.Type), typeofITypeDescriptor };
+                        //ConstructorInfo _constructor = _type.GetConstructor(types);
 
-                        string nomeClasseStatic = string.Concat("jxshell.dotnet4.", classeStatic);
-                        Type _type = Assembly.LoadFile(file).GetType(nomeClasseStatic);
-						var typeofTypeDescriptor = typeof(typeDescriptor);
-						var types = new Type[] { typeof(System.Type), typeofTypeDescriptor };
+                        var alcTypeDescriptor = AssemblyLoadContext.GetLoadContext(Assembly.GetAssembly(typeof(typeDescriptor)));
+						string className = "C" + GetSHA1(type.AssemblyQualifiedName);
+						string staticClassName = className + "_static";
+						string staticClassFullName = string.Concat("jxshell.dotnet4.", staticClassName);
 
-						ConstructorInfo[] info = _type.GetConstructors();
-						ConstructorInfo _constructor = info[0];
-						//ConstructorInfo _constructor = _type.GetConstructor(types);
+						Type _type = alcTypeDescriptor.LoadFromAssemblyPath(fileName).GetType(staticClassFullName);
 
-						var myThis = this;
-						var objects = new object[] { myThis.type, myThis };
-
-						var objetosStr = objects[0].ToString();
-						var construtorStr = _constructor.ToString();
-
-						this.compiledWrapper = (wrapperStatic)Activator.CreateInstance(_type, objects);
-						//this.compiledWrapper = (wrapperStatic)_constructor.Invoke(objects);
+						ConstructorInfo _constructor = _type.GetConstructor(new Type[] { typeof(Type), typeof(typeDescriptor) });
+						var parameters = new object[] { this.type, this };
+						this.compiledWrapper = (wrapperStatic)Activator.CreateInstance(_type, parameters);
+						//this.compiledWrapper = (wrapperStatic)_constructor.Invoke(parameters);
 						this.compiled = true;
 					}
 					else{
+						var alcTypeDescriptor = AssemblyLoadContext.GetLoadContext(Assembly.GetAssembly(typeof(typeDescriptor)));
 						StringBuilder stringBuilder = new StringBuilder();
-						string classeStatic = "";
-						string classe = "";
 						typeDescriptor.addUsingsStatements(stringBuilder);
-						this.precompile(stringBuilder, ref classeStatic, ref classe);
-						stringBuilder.AppendLine("class program{public static void main(){}}");
-					
-						csharplanguage _csharplanguage = typeDescriptor.language;
-						_csharplanguage.runScriptWithId(stringBuilder.ToString(), name);
+						string className = "";
+						string staticClassName = "";
+						this.precompile(stringBuilder, ref staticClassName, ref className);
+						string staticClassFullName = string.Concat("jxshell.dotnet4.", staticClassName);
 
-                        string nomeClasse = string.Concat("jxshell.dotnet4.", classeStatic);
-                        Type _type = _csharplanguage.getCompiledAssembly().GetType(nomeClasse);
+						stringBuilder.AppendLine("class program{public static void main(){}}");
+						csharplanguage _csharplanguage = typeDescriptor.language;
+						_csharplanguage.runScriptWithId(stringBuilder.ToString(), nameSHA1);
+
+						// ToDo: analisar melhor pois a alteração abaixo pode gerar perda de performance pois está recarregando o assembly(não estava localizando o typeDescriptor)
+                        //Type _type = _csharplanguage.getCompiledAssembly().GetType(staticClassFullName);
+						Type _type = alcTypeDescriptor.LoadFromAssemblyPath(fileName).GetType(staticClassFullName);
+						
 						var types = new Type[] { typeof(Type), typeof(typeDescriptor) };
 
-						ConstructorInfo[] info = _type.GetConstructors();
-						ConstructorInfo _constructor = info[0];
-						//var construtor = _constructor.ToString();
-						//ConstructorInfo _constructor = _type.GetConstructor(types);
-						
-						this.compiledWrapper = (wrapperStatic)_constructor.Invoke(new object[] { this.type, this });
+                        ConstructorInfo _constructor = _type.GetConstructor(types);
+                        var parameters = new object[] { this.type, this };
+						this.compiledWrapper = (wrapperStatic)Activator.CreateInstance(_type, parameters);
+						//this.compiledWrapper = (wrapperStatic)_constructor.Invoke(parameters);
 						this.compiled = true;
-						
 					}
 				}
 				catch (Exception exception1)

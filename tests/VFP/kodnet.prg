@@ -295,11 +295,14 @@ DEFINE CLASS jxshell_dotnet4 as Session
 *!*				this.manager.ComputePi()
 
 			
-			? "Antes do CreateObjectX()"
+ 			? "Antes do CreateObjectX()"
+			MESSAGEBOX("Antes do CreateObjectX()")
 			this.manager = CREATEOBJECT("jxshell.dotnet4.Manager2")
 			*this.manager = CREATEOBJECTEX("{9173A427-2F3B-405D-9B0F-23C7B7048114}","")
 			? "Depois do CreateObjectX()"
+			MESSAGEBOX("Depois do CreateObjectX()")
 			this.manager.init()
+
 			*this.manager.setThreadedLibraryFile(this.libpath+"lib.dll")
 
 		CATCH TO ex

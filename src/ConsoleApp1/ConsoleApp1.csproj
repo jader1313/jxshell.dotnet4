@@ -12,9 +12,7 @@
     </PropertyGroup>
 	
     <ItemGroup>
-      <Reference Include="jxshell.dotnet4">
-        <HintPath>..\jxshell.dotnet4\bin\Debug\net6.0\jxshell.dotnet4.dll</HintPath>
-      </Reference>
+      <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
     </ItemGroup>
 
 </Project>
