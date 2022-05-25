@@ -3,37 +3,30 @@ ON SHUTDOWN QUIT
 ON KEY LABEL ALT+F1 Quit
 SET DEFAULT TO "c:\projetos\dotnet\desenvolvimento\vfp\jxshell.dotnet4.fork\tests\vfp\"
 
-*ON ERROR QUIT
-*!*	classe = "jxshell.dotnet4.Manager2"
-*!*	MESSAGEBOX(classe + ' - Inicio')
-*!*	x = CREATEOBJECT(classe)
-*!*	MESSAGEBOX('jxshell - Após criar objeto')
-*!*	x.Init()
-
 *nomeDll = "C:\Kodnet_Teste\Std2_0\Sinca.Integrador.Domain.dll"
-nomeDll = "C:\Kodnet_Teste\Net6\Sinca.Integrador.Domain.dll"
+*nomeDll = "C:\Kodnet_Teste\Net6\Sinca.Integrador.Domain.dll"
+*nomeClasse = "Sinca.Integrador.Domain.Arquivo"
+
+nomeDll    = "D:\ProjetosDotNet\Testes\ChamarTelaWpf.Vfp\src\AplicativoWinUI3\bin\x86\Debug\net6.0-windows10.0.19041.0\win10-x86\LibWinUI3.dll"
+nomeClasse = "LibWinUI3.TelaExemplo1"
 
 ? 'Inicio : ' + nomeDll
-*MESSAGEBOX('Inicio : ' + nomeDll)
-
 DO ("kodnet.prg")
-*MESSAGEBOX('Após rodar kodnet')
-
 _screen.kodnet.loadAssembly("System.Collections")
+_screen.kodnet.loadAssembly("System.Runtime")
 _screen.kodnet.loadAssemblyFile(FULLPATH(nomeDll))
 *MESSAGEBOX('Após carregar assemblies')
 
-*!*	SET STEP ON 
-*!*	TYPE = _screen.kodnet.getTypeOrGenericType("Sinca.Integrador.Domain.Arquivo")
-
-
-arquivoClass  = _screen.kodnet.getStaticWrapper("Sinca.Integrador.Domain.Arquivo")
+wrapper  = _screen.kodnet.getStaticWrapper(nomeClasse)
 MESSAGEBOX('Após getStaticWrapper')
 
-*SET STEP ON 
-arquivoObject = arquivoClass.construct("teste")
-arquivoObject.CaminhoArquivo = "Nome do arquivo"
-? arquivoObject.CaminhoArquivo
+obj = wrapper.construct()
+MESSAGEBOX('Após construct')
+
+*!*	obj.CaminhoArquivo = "Nome do arquivo"
+*!*	? obj.CaminhoArquivo
+obj.Activate()
+
 ret = MESSAGEBOX('jxshell - Após executar'  )
 
 

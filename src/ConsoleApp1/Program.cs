@@ -11,34 +11,39 @@
 //ConstructorInfo _constructor = _type.GetConstructor(types);
 ////var compiledWrapper = (wrapperStatic)_constructor.Invoke(new object[] { this.type, this });
 
+using jxshell.dotnet4;
+
 using System;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 
+object obj = null;
+var teste = C712783c425134c5b5fcc1deccde0e94e859b79a5_static.getWrapper(obj);
+
 
 // Esse é um exemplo tentendo refletir a chamada no VFP
 
-Console.WriteLine("Início");
-var assemblyFileName = @"C:\Projetos\DotNet\Desenvolvimento\VFP\jxshell.dotnet4.fork\src\jxshell.dotnet4\bin\Debug\net6.0\jxshell.dotnet4.dll";
-Console.WriteLine("Carregando assembly: {0}", assemblyFileName);
-var assembly = Assembly.LoadFile(assemblyFileName);
-var a = assembly.ExportedTypes;
-var b = assembly.GetTypes();
-Type type = assembly.GetType("jxshell.dotnet4.Manager");
-var manager = Activator.CreateInstance(type);
-var metodos = type.GetMethods();
-MethodInfo method = type.GetMethod("init");
-method.Invoke(manager, null);
-method = type.GetMethod("loadAssembly", new Type[] { typeof(string) });
-method.Invoke(manager, new object[] { "System.Collections" });
-method = type.GetMethod("loadAssembly", new Type[] { typeof(string) });
-method.Invoke(manager, new object[] { "System.CodeDom" });
-method = type.GetMethod("loadAssemblyFile");
-method.Invoke(manager, new object[] { @"C:\Kodnet_Teste\Std2_0\Sinca.Integrador.Domain.dll" });
-method = type.GetMethod("getStaticWrapper");
-var arquivoClass = method.Invoke(manager, new object[] { "Sinca.Integrador.Domain.Arquivo" });
-Console.WriteLine("FIM");
+//Console.WriteLine("Início");
+//var assemblyFileName = @"C:\Projetos\DotNet\Desenvolvimento\VFP\jxshell.dotnet4.fork\src\jxshell.dotnet4\bin\Debug\net6.0\jxshell.dotnet4.dll";
+//Console.WriteLine("Carregando assembly: {0}", assemblyFileName);
+//var assembly = Assembly.LoadFile(assemblyFileName);
+//var a = assembly.ExportedTypes;
+//var b = assembly.GetTypes();
+//Type type = assembly.GetType("jxshell.dotnet4.Manager2");
+//var manager = Activator.CreateInstance(type);
+//var metodos = type.GetMethods();
+//MethodInfo method = type.GetMethod("init");
+//method.Invoke(manager, null);
+//method = type.GetMethod("loadAssembly", new Type[] { typeof(string) });
+//method.Invoke(manager, new object[] { "System.Collections" });
+//method = type.GetMethod("loadAssembly", new Type[] { typeof(string) });
+//method.Invoke(manager, new object[] { "System.CodeDom" });
+//method = type.GetMethod("loadAssemblyFile");
+//method.Invoke(manager, new object[] { @"C:\Kodnet_Teste\Std2_0\Sinca.Integrador.Domain.dll" });
+//method = type.GetMethod("getStaticWrapper");
+//var arquivoClass = method.Invoke(manager, new object[] { "Sinca.Integrador.Domain.Arquivo" });
+//Console.WriteLine("FIM");
 
 //var arquivoObject = arquivoClass.construct("teste");
 //arquivoObject.NomeArquivo = "Nome do arquivo"

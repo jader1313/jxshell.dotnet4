@@ -26,12 +26,8 @@
   </ItemGroup>
 	
   <ItemGroup>
-    <Reference Include="jxshell.base">
-      <HintPath>..\..\src\jxshell.dotnet4\bin\Debug\net6.0\jxshell.base.dll</HintPath>
-    </Reference>
-    <Reference Include="jxshell.dotnet4">
-      <HintPath>..\..\src\jxshell.dotnet4\bin\Debug\net6.0\jxshell.dotnet4.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\src\jxshell.base\jxshell.base.csproj" />
+    <ProjectReference Include="..\..\src\jxshell.dotnet4\jxshell.dotnet4.csproj" />
   </ItemGroup>
 
 </Project>

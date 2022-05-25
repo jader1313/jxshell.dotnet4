@@ -101,13 +101,14 @@ namespace jxshell
 			var references = CreateReferences(compilerParameters);
 
 			var dllFileName = Path.GetFileNameWithoutExtension(compilerParameters.OutputAssembly) + ".dll";
+			var pdbFileName = Path.Combine(Path.GetDirectoryName(compilerParameters.OutputAssembly), Path.GetFileNameWithoutExtension(compilerParameters.OutputAssembly) + ".pdb");
 
 			var compilation = CSharpCompilation.Create(dllFileName)
 				.WithOptions(compilationOptions)
 				.AddReferences(references)
 				.AddSyntaxTrees(syntaxTree);
 
-			var result = compilation.Emit(compilerParameters.OutputAssembly);
+			var result = compilation.Emit(compilerParameters.OutputAssembly, pdbFileName);
 			if (!result.Success)
 			{
 				StringBuilder stringBuilder = new StringBuilder();

@@ -3,6 +3,7 @@ using jxshell.dotnet4;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 using System;
 using System.IO;
@@ -22,7 +23,7 @@ namespace jxshell.tests
             manager.init();
             manager.loadAssembly("System.Collections");
             manager.loadAssemblyFile(@"C:\Kodnet_Teste\Net6\Sinca.Integrador.Domain.dll");
-            var arquivo = manager.getStaticWrapper("Sinca.Integrador.Domain.Arquivo");
+            wrapperStatic? arquivo = manager.getStaticWrapper("Sinca.Integrador.Domain.Arquivo");
             //var arquivoObject = arquivo.construct();
             //var arquivoObject.NomeArquivo = "Nome do arquivo";
 
@@ -43,8 +44,7 @@ namespace jxshell.tests
             //var arquivoObject.NomeArquivo = "Nome do arquivo";
             Assert.NotNull(manager);
         }
-
-        [Fact]
+[Fact]
         public void DeveCompilarEGerarArquivo()
         {
             environment.initEnvironment();
