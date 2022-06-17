@@ -3,33 +3,51 @@ ON SHUTDOWN QUIT
 ON KEY LABEL ALT+F1 Quit
 SET DEFAULT TO "c:\projetos\dotnet\desenvolvimento\vfp\jxshell.dotnet4.fork\tests\vfp\"
 
-*nomeDll = "C:\Kodnet_Teste\Std2_0\Sinca.Integrador.Domain.dll"
-*nomeDll = "C:\Kodnet_Teste\Net6\Sinca.Integrador.Domain.dll"
-*nomeClasse = "Sinca.Integrador.Domain.Arquivo"
+nomeClasse = "InjecaoDependenciaNET6.DependencyInjection<InjecaoDependenciaNET6.Mensagem>"
+*nomeClasse = "InjecaoDependenciaNET6.MinhaClasse"
 
-nomeDll    = "D:\ProjetosDotNet\Testes\ChamarTelaWpf.Vfp\src\AplicativoWinUI3\bin\x86\Debug\net6.0-windows10.0.19041.0\win10-x86\LibWinUI3.dll"
-nomeClasse = "LibWinUI3.TelaExemplo1"
+? 'Inicio : ' 
 
-? 'Inicio : ' + nomeDll
-DO ("kodnet.prg")
-_screen.kodnet.loadAssembly("System.Collections")
-_screen.kodnet.loadAssembly("System.Runtime")
-_screen.kodnet.loadAssemblyFile(FULLPATH(nomeDll))
-*MESSAGEBOX('Após carregar assemblies')
+lcCaminhoDlls = "D:\ProjetosDotNet\Testes\TESTE KODNET\TESTE InjecaoDependencia\ConsoleAppNetFramework48\ConsoleDependencyInjectionNET6_DLL_NET6\bin\x86\Release\net6.0\"
+*nomeDll = "D:\ProjetosDotNet\Testes\TESTE KODNET\TESTE InjecaoDependencia\jxshell.dotnet4-master\tests\VFP\dotNet\InjecaoDependencia.dll"
+*nomeDll = "D:\ProjetosDotNet\Testes\TESTE KODNET\TESTE InjecaoDependencia\jxshell.dotnet4-master\tests\VFP\dotNet\InjecaoDependenciaNET6.dll"
+nomeDll = "InjecaoDependenciaNET6.dll"
+DO FULLPATH('kodnet.prg')
 
-wrapper  = _screen.kodnet.getStaticWrapper(nomeClasse)
+kodnet = _screen.kodnet
+
+kodnet.loadAssembly("System.Collections")
+kodnet.loadAssembly("System.Runtime")
+
+kodnet.loadAssemblyFile(lcCaminhoDlls + "Microsoft.Extensions.Hosting.dll")
+kodnet.loadAssemblyFile(lcCaminhoDlls + "Microsoft.Extensions.Hosting.Abstractions.dll")
+kodnet.loadAssemblyFile(lcCaminhoDlls + "Microsoft.Extensions.DependencyInjection.dll")
+
+kodnet.loadAssemblyFile(lcCaminhoDlls + nomeDll)
+MESSAGEBOX('Após carregar assemblies')
+
+wrapper  = kodnet.getStaticWrapper(nomeClasse)
 MESSAGEBOX('Após getStaticWrapper')
 
-obj = wrapper.construct()
+objDI = wrapper.construct()
 MESSAGEBOX('Após construct')
 
-*!*	obj.CaminhoArquivo = "Nome do arquivo"
-*!*	? obj.CaminhoArquivo
-obj.Activate()
+*!*	obj.ConfigurarInjecaoDependencia()
+*!*	MESSAGEBOX('Após ConfigurarInjecaoDependencia')
+
+*!*	loMensagem = loInjecaoDependenciaMensagemObj.CriarInstancia()
+objMinhaClasse = objDI.CriarInstanciaMinhaClasse()
+frase = objMinhaClasse.GetMsg()
+MESSAGEBOX(frase)
+
+objDI.ConfigurarInjecaoDependencia()
+MESSAGEBOX('Após ConfigurarInjecaoDependencia')
+
+testeGenerico = objDI.CriarInstancia()
+MESSAGEBOX(testeGenerico.GetMsg())
+
 
 ret = MESSAGEBOX('jxshell - Após executar'  )
-
-
 IF ret = 1
 	CLEAR EVENTS
 	CANCEL 

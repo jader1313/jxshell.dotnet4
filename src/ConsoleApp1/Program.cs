@@ -11,26 +11,81 @@
 //ConstructorInfo _constructor = _type.GetConstructor(types);
 ////var compiledWrapper = (wrapperStatic)_constructor.Invoke(new object[] { this.type, this });
 
-using jxshell.dotnet4;
+//using jxshell.dotnet4;
 
 using System;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.Loader;
 
-object obj = null;
-var teste = C712783c425134c5b5fcc1deccde0e94e859b79a5_static.getWrapper(obj);
-
-
-// Esse é um exemplo tentendo refletir a chamada no VFP
 
 //Console.WriteLine("Início");
-//var assemblyFileName = @"C:\Projetos\DotNet\Desenvolvimento\VFP\jxshell.dotnet4.fork\src\jxshell.dotnet4\bin\Debug\net6.0\jxshell.dotnet4.dll";
+//var assemblyFileName = @"C:\Users\User\kodnet\compilation\F771CDE0227EFA47C295018CBEC90B5DA173C38B.DLL";
 //Console.WriteLine("Carregando assembly: {0}", assemblyFileName);
 //var assembly = Assembly.LoadFile(assemblyFileName);
 //var a = assembly.ExportedTypes;
 //var b = assembly.GetTypes();
-//Type type = assembly.GetType("jxshell.dotnet4.Manager2");
+//Type type = assembly.GetType("jxshell.dotnet4.Cf771cde0227efa47c295018cbec90b5da173c38b_static");
+//var manager = Activator.CreateInstance(type);
+//var metodos = type.GetMethods();
+
+////var teste = type.GetMethod.getWrapper();
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Console.WriteLine("Início");
+
+//var alc = new AssemblyLoadContext("UmNomeQualquer", isCollectible: true);
+var alc = AssemblyLoadContext.Default;
+
+var jxshell4FullFileName = @"C:\Projetos\DotNet\Desenvolvimento\VFP\jxshell.dotnet4.fork\src\jxshell.dotnet4\bin\Debug\net6.0\jxshell.dotnet4.dll";
+Console.WriteLine("Carregando assembly: {0}", jxshell4FullFileName);
+Assembly assembly = alc.LoadFromAssemblyPath(jxshell4FullFileName);
+
+var jxshellBaseFullFileName = @"C:\Projetos\DotNet\Desenvolvimento\VFP\jxshell.dotnet4.fork\src\jxshell.dotnet4\bin\Debug\net6.0\jxshell.base.dll";
+Console.WriteLine("Carregando assembly: {0}", jxshellBaseFullFileName);
+var assemblyBase = alc.LoadFromAssemblyPath(jxshellBaseFullFileName);
+
+Type type = assembly.GetType("jxshell.dotnet4.Manager");
+dynamic? manager = Activator.CreateInstance(type);
+manager.init();
+manager.loadAssembly("System.Collections");
+
+// Dessa forma FUNCIONA
+//var assem = alc.LoadFromAssemblyPath(@"C:\Kodnet_Teste\Net6\Sinca.Integrador.Domain.dll");
+//dynamic obj = assem?.CreateInstance(string.Concat("Sinca.Integrador.Domain", ".", "Arquivo"), false, BindingFlags.Default, null, new object[] { "MyParameter" }, null, null);
+
+// Dessa forma FUNCIONA
+//dynamic obj = Activator.CreateInstanceFrom(@"C:\Kodnet_Teste\Net6\Sinca.Integrador.Domain.dll", "Sinca.Integrador.Domain.Arquivo", false, BindingFlags.Default, null, new object[] { "MyParameter" }, null, null).Unwrap();
+
+// Dessa forma FUNCIONA
+manager.loadAssemblyFile(@"C:\Kodnet_Teste\Net6\Sinca.Integrador.Domain.dll", alc);
+Assembly assemblyDomain = AssemblyLoadContext.Default.Assemblies.FirstOrDefault(x => x.FullName.Contains("Sinca.Integrador.Domain"));
+dynamic obj = assemblyDomain.CreateInstance("Sinca.Integrador.Domain.Arquivo", false, BindingFlags.Default, null, new object[] { "MyParameter" }, null, null);
+
+Console.WriteLine("Caminho: " + obj.CaminhoArquivo);
+Console.WriteLine("FIM");
+//alc.Unload();
+
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+// Esse é um exemplo tentendo refletir a chamada no VFP
+
+//Console.WriteLine("Início");
+
+//var jxshell4FullFileName = @"C:\Projetos\DotNet\Desenvolvimento\VFP\jxshell.dotnet4.fork\src\jxshell.dotnet4\bin\Debug\net6.0\jxshell.dotnet4.dll";
+//Console.WriteLine("Carregando assembly: {0}", jxshell4FullFileName);
+//var assembly = Assembly.LoadFile(jxshell4FullFileName);
+
+////var jxshellBaseFullFileName = @"C:\Projetos\DotNet\Desenvolvimento\VFP\jxshell.dotnet4.fork\src\jxshell.dotnet4\bin\Debug\net6.0\jxshell.base.dll";
+////Console.WriteLine("Carregando assembly: {0}", jxshellBaseFullFileName);
+////var assemblyBase = Assembly.LoadFile(jxshellBaseFullFileName);
+
+
+//var a = assembly.ExportedTypes;
+//var b = assembly.GetTypes();
+//Type type = assembly.GetType("jxshell.dotnet4.Manager");
 //var manager = Activator.CreateInstance(type);
 //var metodos = type.GetMethods();
 //MethodInfo method = type.GetMethod("init");
@@ -44,6 +99,8 @@ var teste = C712783c425134c5b5fcc1deccde0e94e859b79a5_static.getWrapper(obj);
 //method = type.GetMethod("getStaticWrapper");
 //var arquivoClass = method.Invoke(manager, new object[] { "Sinca.Integrador.Domain.Arquivo" });
 //Console.WriteLine("FIM");
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------
 
 //var arquivoObject = arquivoClass.construct("teste");
 //arquivoObject.NomeArquivo = "Nome do arquivo"

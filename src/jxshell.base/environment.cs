@@ -126,8 +126,8 @@ namespace jxshell
 			string str;
 			if ((path.EndsWith("/") ? false : !path.EndsWith("\\")))
 			{
-				char altDirectorySeparatorChar = Path.AltDirectorySeparatorChar;
-				str = string.Concat(path, altDirectorySeparatorChar.ToString());
+				char DirectorySeparatorChar = Path.DirectorySeparatorChar; // Path.AltDirectorySeparatorChar;
+				str = string.Concat(path, DirectorySeparatorChar.ToString());
 			}
 			else
 			{

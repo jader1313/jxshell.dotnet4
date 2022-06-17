@@ -243,9 +243,10 @@ namespace jxshell.dotnet4
 			this.@add(a);
 		}
 
-		public void loadAssemblyFile(string file)
+		public void loadAssemblyFile(string file, AssemblyLoadContext alc = null)
 		{
-			string item = environment.addBs(Path.GetDirectoryName(file));
+			string path = Path.GetDirectoryName(file);
+			string item = environment.addBs(path);
 			if (environment.directories.IndexOf(item) < 0)
 			{
 				environment.directories.Add(item);
@@ -253,7 +254,16 @@ namespace jxshell.dotnet4
 			string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(file);
 			try
 			{
-				Assembly assembly = Assembly.LoadFile(file);
+				if (alc == null)
+                {
+					//var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetAssembly(typeof(typeDescriptor)));
+					alc = AssemblyLoadContext.Default;
+					var assemblies = alc.Assemblies;
+					//alc = new AssemblyLoadContext(Guid.NewGuid().ToString());
+				}
+				Assembly assembly = alc.LoadFromAssemblyPath(file);
+				//Assembly assembly = Assembly.LoadFile(file);
+
 				this.fileAssemblies[assembly.FullName] = assembly;
 				this.fileAssemblies[fileNameWithoutExtension] = assembly;
 				this.@add(assembly);

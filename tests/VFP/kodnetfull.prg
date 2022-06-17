@@ -5,51 +5,50 @@
 
 LOCAL localPath
 localPath= JUSTPATH(SYS(16))
+IF _vfp.StartMode!=0
+	localpath= JUSTPATH(_vfp.ServerName)
+ENDIF 
 
-*SET STEP ON 
+? 'LocalPath: ' + localPath
 
-if(TYPE("_screen.dotnet4")=="O" and !isnull(_screen.dotnet4))
-	if(TYPE("_screen.dotnet4manager")=="O" and !isnull(_screen.dotnet4manager))
+if(TYPE("_screen.dotnet4full")=="O" and !isnull(_screen.dotnet4full))
+	if(TYPE("_screen.dotnet4fullmanager")=="O" and !isnull(_screen.dotnet4fullmanager))
 		RETURN 
 	ENDIF 
 ENDIF 
 SET PATH TO (m.localpath) additive
-SET PATH TO (m.localpath+"\lib") additive
+SET PATH TO (m.localpath+"/lib") additive
 *DO wwDotnet4
 
 * Programa creado por Michael Suárez para interactura con .NET desde VFP ...
-LOCAL dotnet4
+LOCAL dotnet4full
 
-*SET STEP ON 
-
-dotnet4 = CREATEOBJECT("jxshell_dotnet4")
-dotnet4.path = m.localpath+"\"
-dotnet4.libPath = dotnet4.path + "lib\"
+dotnet4full = CREATEOBJECT("jxshell_dotnet4")
+dotnet4full.path = m.localpath+"\"
+dotnet4full.libPath = dotnet4full.path + "lib\"
 
 
 * Ahora se debe cargar el ensamblado encargado de todo ...
-dotnet4.initClr()
+dotnet4full.initClr()
 LOCAL manager
-manager = dotnet4.getClr()
+manager = dotnet4full.getClr()
 
-_screen.AddProperty("dotnet4Manager", m.dotnet4)
-_screen.AddProperty("__dotnet4", m.manager)
-_screen.AddProperty("__dotnetv", CREATEOBJECT("kodnet"))
-_screen.AddProperty("dotnet4", m.manager)
-_screen.AddProperty("kodnet", m.manager)
-_screen.AddProperty("kodnetManager", m.dotnet4)
+_screen.AddProperty("dotnet4fullManager", m.dotnet4full)
+_screen.AddProperty("__dotnet4full", m.manager)
+_screen.AddProperty("__dotnetv", CREATEOBJECT("kodnetfull"))
+_screen.AddProperty("dotnet4full", m.manager)
+_screen.AddProperty("kodnetfull", m.manager)
+_screen.AddProperty("kodnetfullManager", m.dotnet4full)
 RETURN manager
 
-*-------------------------------------------------------------------------------------------------------
 DEFINE CLASS jxshell_dotnet4ui as session
-*-------------------------------------------------------------------------------------------------------
 	dataSession=1
 	anchorStyles = null
 	_anchorStyles = null
 	
 	FUNCTION anchorStyles_access()
 		if(ISNULL(this._anchorStyles))
-			this._anchorStyles= _Screen.dotnet4.getStaticWrapper("System.Windows.Forms.AnchorStyles")
+			this._anchorStyles= _Screen.dotnet4full.getStaticWrapper("System.Windows.Forms.AnchorStyles")
 		ENDIF 
 		RETURN this._anchorStyles
 	ENDFUNC 
@@ -57,9 +56,7 @@ ENDDEFINE
 
 * THIS CLASSES (kodnet, kodnetWrapper) ARE FOR A EXPERIMENT TRYING TO INCREASE PERFORMANCE IN LOADING TIME
 * AND REALLY CAN INCREASE PERFORMANCE ON LOADING TIME, BUT DECREASES ON INVOKING METHODS
-*-------------------------------------------------------------------------------------------------------
 DEFINE CLASS kodnetWrapper as session  
-*-------------------------------------------------------------------------------------------------------
 	__helper= null 
 	___obj= null
 	FUNCTION init(helper, obj)
@@ -72,20 +69,15 @@ DEFINE CLASS kodnetWrapper as session
 
 ENDDEFINE 
 
-*-------------------------------------------------------------------------------------------------------
-DEFINE CLASS kodnet as Custom 
-*-------------------------------------------------------------------------------------------------------
+DEFINE CLASS kodnetfull as Custom 
 
 	helpers= null
 	tmpfolder= null 
 	FUNCTION init()
-
-	*SET STEP ON 
-
 		LOCAL folder 
 		this.helpers= CREATEOBJECT('collection')
 		folder= GETENV("APPDATA")
-		folder= ADDBS(m.folder) + "kodnet"
+		folder= ADDBS(m.folder) + "kodnetfull"
 		IF !DIRECTORY(m.folder)
 			MKDIR (m.folder )
 		ENDIF 
@@ -116,12 +108,11 @@ DEFINE CLASS kodnet as Custom
 	ENDFUNC 
 	
 	FUNCTION create(helper)
-		RETURN CREATEOBJECT("kodnetWrapper", m.helper)
+		RETURN CREATEOBJECT("kodnetfullWrapper", m.helper)
 	ENDFUNC 
 	
 	FUNCTION getStaticWrapper(type)
 		LOCAL typeD, helper
-		
 		typeD= NULL 
 		helper= null 
 		TRY 
@@ -129,8 +120,8 @@ DEFINE CLASS kodnet as Custom
 		CATCH TO er 
 		ENDTRY
 		IF ISNULL(m.helper)
-			typeD= _screen.__dotnet4.loadTypeNoCompile(m.type)
-			helper= _screen.__dotnet4.vfpHelper(m.typeD)
+			typeD= _screen.__dotnet4full.loadTypeNoCompile(m.type)
+			helper= _screen.__dotnet4full.vfpHelper(m.typeD)
 			
 			* compile class 
 			ast= m.helper.compile()
@@ -145,26 +136,17 @@ DEFINE CLASS kodnet as Custom
 
 ENDDEFINE 
 
-*-------------------------------------------------------------------------------------------------------
-DEFINE CLASS jxshell_event as custom
-*-------------------------------------------------------------------------------------------------------
+DEFINE CLASS jxshell_event as Session
 	target=null
-	_method=''
-	
 	FUNCTION init(target,method)
 		IF !(m.target.baseclass == "Form")
 			this.target= m.target
-			this._method = m.method
-		
 			ADDPROPERTY(this.target, "_event_" + m.method, this)
-		ENDIF
-		
-		* THIS NOT WORKING ON VFPA
-		BINDEVENT(this, "invoke", m.target, m.method)	
+		ENDIF 
+		BINDEVENT(this, "invoke", m.target, m.method)
 	ENDFUNC 
-	
 	FUNCTION invoke()
-		LPARAMETERS e1,e2,e3,e4,e5,e6
+		LPARAMETERS e1,e2,e3
 	ENDFUNC 
 	FUNCTION destroy()
 		this.target= null
@@ -172,9 +154,7 @@ DEFINE CLASS jxshell_event as custom
 
 ENDDEFINE 
 
-*-------------------------------------------------------------------------------------------------------
 DEFINE CLASS jxshell_dotnet4 as Session
-*-------------------------------------------------------------------------------------------------------
 	
 	dataSession=1
 	manager = null
@@ -198,12 +178,12 @@ DEFINE CLASS jxshell_dotnet4 as Session
 		* 0 - compile with c#
 		* 1 - compile with VFP 
 		IF mode == 0
-			_screen.dotnet4= _screen.__dotnet4 
-			_screen.kodnet= _screen.__dotnet4 
+			_screen.dotnet4full= _screen.__dotnet4full 
+			_screen.kodnetfull= _screen.__dotnet4full 
 		ENDIF 
 		IF mode == 1
-			_screen.dotnet4= _screen.__dotnetv 
-			_screen.kodnet= _screen.__dotnetv
+			_screen.dotnet4full= _screen.__dotnetv 
+			_screen.kodnetfull= _screen.__dotnetv
 		ENDIF 
 		
 	ENDFUNC 
@@ -223,16 +203,16 @@ DEFINE CLASS jxshell_dotnet4 as Session
 	ENDFUNC 
 	FUNCTION initUi()
 		if(!this.initedUi)
-			_screen.dotnet4.loadAssemblyPartialName("System")
-			_screen.dotnet4.loadAssemblyPartialName("System.Drawing")
-			_screen.dotnet4.loadAssemblyPartialName("System.Windows.Forms")
+			_screen.dotnet4full.loadAssemblyPartialName("System")
+			_screen.dotnet4full.loadAssemblyPartialName("System.Drawing")
+			_screen.dotnet4full.loadAssemblyPartialName("System.Windows.Forms")
 			
-			_screen.dotnet4.loadManyTypes("System.Drawing.Font-System.EventHandler-System.EventArgs-System.Windows.Forms.Form-System.Windows.Forms.Application-System.Windows.Forms.Button-System.Windows.Forms.ComboBox-"+;
+			_screen.dotnet4full.loadManyTypes("System.Drawing.Font-System.EventHandler-System.EventArgs-System.Windows.Forms.Form-System.Windows.Forms.Application-System.Windows.Forms.Button-System.Windows.Forms.ComboBox-"+;
 				"System.Windows.Forms.TextBox-System.Windows.Forms.Control-System.Drawing.Color-System.Drawing.Bitmap"+;
 				"-System.Drawing.PointF-System.Drawing.RectangleF-System.Drawing.Point-System.Drawing.Rectangle")
 				
 			LOCAL app
-			app= _screen.dotnet4.getStaticWrapper("System.Windows.Forms.Application")
+			app= _screen.dotnet4full.getStaticWrapper("System.Windows.Forms.Application")
 			app.enableVisualStyles()
 			
 			this.initedUi= .t.
@@ -244,27 +224,10 @@ DEFINE CLASS jxshell_dotnet4 as Session
 			className = "System.EventHandler" 
 		ENDIF 
 		LOCAL ev, even
-		ev = _Screen.dotnet4.getStaticWrapper(m.className)
-		
-		
-		*even= CREATEOBJECT("jxshell_event", m.object, m.method)
-		*RETURN ev.construct(m.even, "invoke")
-		
-		IF !(m.object.baseclass == "Form")
-			*even= CREATEOBJECT("jxshell_event", m.object, m.method)
-		endif 
-		
-		
-		ev0 = ev.construct(m.object, m.method)
-		
-		*try
-		*	addproperty(m.object, "_event_" + m.method, null)
-		*catch to er 
-		*endtry 
-		*str = "m.object._event_" + m.method + "=m.ev0"
-		*&str 
-
-		return ev0
+		ev = _Screen.dotnet4full.getStaticWrapper(m.className)
+		even= CREATEOBJECT("jxshell_event", m.object, m.method)
+		RETURN ev.construct(m.even, "invoke")
+		*RETURN ev.construct(m.object, m.method)
 		
 	ENDFUNC 
 
@@ -288,75 +251,55 @@ DEFINE CLASS jxshell_dotnet4 as Session
 		if(!ISNULL(this.manager))
 			RETURN 
 		ENDIF 
-		LOCAL dotnet4File, er, er1
-		dotnet4File = this.libpath + "jxshell.dotnet4.dll"
+		LOCAL dotnet4fullFile, er, er1
+		dotnet4fullFile = this.libpath + "jxshell.dotnet4.dll"
 
 		try
+			*this.wwDotnet = CREATEOBJECT("wwDotNetBridge", "v4",.f.)
+			*this.wwDotnet.loadAssembly(m.dotnet4File)
+			*this.manager = this.wwdotnet.createinstance("jxshell.dotnet4.Manager")
 			
-			* ya no es necesario el código de CLRHOST
-			* automáticamente se registra al usuario (no admin rights)
-			* al instalar 
-			
-*!*				
-*!*				? "Antes do CreateObjectX()"
-*!*				this.manager = CREATEOBJECTEX("{A416E671-8AD7-4D74-AFDC-B02D030F2A88}","", "{1BD9E816-E1DF-4DFE-8CEA-AFB13E944311}")
-*!*				? "Depois do CreateObjectX()"
-*!*				*this.manager.init()
-*!*				this.manager.SayHello()
+			DECLARE Integer SetClrVersion IN FULLPATH("clrhost.dll") string
+			SetClrVersion("v4.0.30319")
+			DECLARE Integer ClrCreateInstanceFrom IN FULLPATH("clrhost.dll") string, string, string@, integer@
 
-*!*				? "Antes do CreateObjectX()"
-*!*				this.manager = CREATEOBJECTEX("{DB1797F5-7198-4411-8563-D05F4E904956}","","{BA9AC84B-C7FC-41CF-8B2F-1764EB773D4B}")
-*!*				? "Depois do CreateObjectX()"
-*!*				*this.manager.init()
-*!*				this.manager.ComputePi()
+			lcError = SPACE(2048)
+			lnSize = 0
+			lnDispHandle = ClrCreateInstanceFrom(m.dotnet4fullFile,;
+					"jxshell.dotnet4.Manager",@lcError,@lnSize)
 
+			IF lnDispHandle < 1
+			   error( "Unable to load CLR. " + LEFT(lcError,lnSize) )
+			   RETURN NULL 
+			ENDIF
+
+			*** Turn handle into IDispatch COM object
+			this.manager = SYS(3096, lnDispHandle)	
+
+			*** Explicitly AddRef here - otherwise weird shit happens when objects are released
+			SYS(3097, this.manager)
+
+			IF ISNULL(this.manager)
+				error( "No se puede inicializar el manejador de las clases CLR. Error desconocido." )
+				RETURN null
+			ENDIF
 			
- 			? "Antes do CreateObjectX()"
-			*MESSAGEBOX("Antes do CreateObjectX()")
-			this.manager = CREATEOBJECT("jxshell.dotnet4.Manager2")
-			*this.manager = CREATEOBJECTEX("{9173A427-2F3B-405D-9B0F-23C7B7048114}","")
-			? "Depois do CreateObjectX()"
-			*MESSAGEBOX("Depois do CreateObjectX()")
 			this.manager.init()
-
-			*this.manager.setThreadedLibraryFile(this.libpath+"lib.dll")
-
+			this.manager.setThreadedLibraryFile(this.libpath+"lib.dll")
 		CATCH TO ex
 			er = ex.message
 			er1= ex.ErrorNo
 			
 		ENDTRY 
 		if(!EMPTY(m.er))
-			? M.ER
-
 			ERROR m.er1, m.er
 		ENDIF 			
 
 	ENDFUNC 
 	
-	FUNCTION await(toTask)
-		LOCAL lcERR 
-		DECLARE Sleep IN kernel32 as await_sleep integer
-		
-		DO WHILE NOT toTask.IsCompleted
-			await_sleep(10)
-		ENDDO 
-		
-		CLEAR DLLS 'await_sleep'
-
-		IF toTask.IsFaulted
-			lcERR = toTask.Exception.ToString()
-			ERROR lcErr
-		ENDIF 
-		
-		RETURN toTask.Result
-	ENDFUNC 
-	
 ENDDEFINE
 
-*-------------------------------------------------------------------------------------------------------
 DEFINE CLASS JXSHELLDOTNET4_WIN32API AS Session
-*-------------------------------------------------------------------------------------------------------
 	datasession =1
 	
 	FUNCTION init()
