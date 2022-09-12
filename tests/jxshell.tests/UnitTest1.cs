@@ -23,13 +23,35 @@ namespace jxshell.tests
 {
     public class UnitTest1
     {
-        private const string DllNet6FullFileName = @"C:\Kodnet_Teste\Net6\Sinca.Integrador.Domain.dll";
+        private string DllNet6FullFileName = Path.GetFullPath(@"..\..\..\..\DLLs\Net6\Sinca.Integrador.Domain.dll");
+        private string DllStd2_0FullFileName = Path.GetFullPath(@"..\..\..\..\DLLs\Std2_0\Sinca.Integrador.Domain.dll");
+        private string CaminhoDlls = @"D:\ProjetosDotNet\Testes\TESTE KODNET\TESTE InjecaoDependencia\ConsoleAppNetFramework48\ConsoleDependencyInjectionNET6_DLL_NET6\bin\x86\Release\net6.0\";
+
+        [Fact]
+        public void KodnetGetStaticWrapper_SystemDecimal()
+        {
+            //Arrenge
+            var manager = new Manager();
+            manager.loadAssembly("System.Collections");
+            manager.loadAssembly("System.Runtime");
+            manager.loadAssembly("System.Private.CoreLib");
+            manager.init();
+            //manager.loadAssembly("System.Decimal");
+            //Assembly assemblyName = new();
+            //Act
+            var systemDescinal = manager.getStaticWrapper("System.Decimal");
+            //var systemDescinal = Construct(manager, "System", "System.Decimal");
+            //var systemDescinal2 = Construct(assemblyName, "System", "Decimal");
+
+            //Assert
+            Assert.NotNull(systemDescinal);
+        }
 
         [Fact]
         public void KodnetGetStaticWrapper()
         {
             var manager = new Manager();
-            var nomeDll = @"D:\ProjetosDotNet\Testes\TESTE KODNET\TESTE InjecaoDependencia\ConsoleAppNetFramework48\ConsoleDependencyInjectionNET6_DLL_NET6\bin\x86\Release\net6.0\InjecaoDependenciaNET6.dll";
+            var nomeDll = Path.Combine(CaminhoDlls,"InjecaoDependenciaNET6.dll");
             manager.loadAssembly("System.Collections");
             manager.loadAssembly("System.Runtime");
             manager.loadAssemblyFile(nomeDll);
@@ -63,7 +85,7 @@ namespace jxshell.tests
             var codeString = GetCodeString_MyHost();
             Manager manager = NewInitializedManager();
 
-            var caminhoDlls = @"D:\ProjetosDotNet\Testes\TESTE KODNET\TESTE InjecaoDependencia\ConsoleAppNetFramework48\ConsoleDependencyInjectionNET6_DLL_NET6\bin\x86\Release\net6.0\";
+            var caminhoDlls = CaminhoDlls;
             manager.loadAssemblyFile(caminhoDlls + "Microsoft.Extensions.Hosting.dll");
             manager.loadAssemblyFile(caminhoDlls + "Microsoft.Extensions.Hosting.Abstractions.dll");
             manager.loadAssemblyFile(caminhoDlls + "Microsoft.Extensions.DependencyInjection.dll");
@@ -107,7 +129,7 @@ namespace jxshell.tests
         {
             Manager manager = NewInitializedManager();
             manager.loadAssembly("System.Collections");
-            manager.loadAssemblyFile(DllNet6FullFileName); //, new AssemblyLoadContext("TesteNet6", true));
+            manager.loadAssemblyFile(DllNet6FullFileName, new AssemblyLoadContext("TesteNet6", true));  // sem o novo contexto dá erro quando roda todos os testes ao mesmo tempo
             dynamic obj = Construct(manager, "Sinca.Integrador.Domain", "Arquivo", new object[] { "MyParameter" });
             Assert.Equal("MyParameter", obj?.CaminhoArquivo);
         }
@@ -119,7 +141,7 @@ namespace jxshell.tests
             var manager = new Manager();
             manager.init();
             manager.loadAssembly("System.Collections");
-            manager.loadAssemblyFile(@"C:\Kodnet_Teste\Std2_0\Sinca.Integrador.Domain.dll");
+            manager.loadAssemblyFile(DllStd2_0FullFileName);
             var arquivo = manager.getStaticWrapper("Sinca.Integrador.Domain.Arquivo");
             //var arquivoDto = manager.getStaticWrapper("Sinca.Integrador.Domain.Retorno.ArquivoRecebidoDto");
             //var arquivoObject = arquivo.construct();
@@ -396,7 +418,7 @@ namespace jxshell.tests
             references.Add(MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Runtime.dll")));
             references.Add(MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Private.CoreLib.dll")));
 
-            var caminhoDlls = @"D:\ProjetosDotNet\Testes\TESTE KODNET\TESTE InjecaoDependencia\ConsoleAppNetFramework48\ConsoleDependencyInjectionNET6_DLL_NET6\bin\x86\Release\net6.0\";
+            var caminhoDlls = CaminhoDlls;
             references.Add(MetadataReference.CreateFromFile(caminhoDlls + "Microsoft.Extensions.Hosting.dll"));
             references.Add(MetadataReference.CreateFromFile(caminhoDlls + "Microsoft.Extensions.Hosting.Abstractions.dll"));
             references.Add(MetadataReference.CreateFromFile(caminhoDlls + "Microsoft.Extensions.DependencyInjection.dll"));
@@ -409,7 +431,6 @@ namespace jxshell.tests
             if (compilationResult.Success)
             {
                 var alc = new AssemblyLoadContext("UmNomeQualquer", isCollectible: true);
-                //var caminhoDlls = @"D:\ProjetosDotNet\Testes\TESTE KODNET\TESTE InjecaoDependencia\ConsoleAppNetFramework48\ConsoleDependencyInjectionNET6_DLL_NET6\bin\x86\Release\net6.0\";
                 alc.LoadFromAssemblyPath(caminhoDlls + "Microsoft.Extensions.Hosting.dll");
                 alc.LoadFromAssemblyPath(caminhoDlls + "Microsoft.Extensions.Hosting.Abstractions.dll");
                 alc.LoadFromAssemblyPath(caminhoDlls + "Microsoft.Extensions.DependencyInjection.dll");
