@@ -231,9 +231,10 @@ namespace jxshell.dotnet4
 			this.loadAssembly(typeof(WebClient).Assembly);
 			this.loadAssembly(typeof(typeDescriptor).Assembly);
 			this.loadAssembly(typeof(jxshell.csharplanguage).Assembly);
-		}
+            this.loadAssembly("System.Private.CoreLib");
+        }
 
-		public void loadAssembly(string name)
+        public void loadAssembly(string name)
 		{
 			this.@add(Assembly.Load(name));
 		}

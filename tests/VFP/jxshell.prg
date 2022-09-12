@@ -1,7 +1,8 @@
 Inicializar()
 
-TesteInjecaoDependencia()
+*TesteInjecaoDependencia()
 *TesteDto()
+TesteSystem()
 
 Finalizar()
 
@@ -14,6 +15,19 @@ FUNCTION Inicializar()
 	ON KEY LABEL ALT+F1 Quit
 	SET DEFAULT TO "c:\projetos\dotnet\desenvolvimento\vfp\jxshell.dotnet4.fork\tests\vfp\"
 	DO FULLPATH('kodnet.prg')
+
+*-----------------------------------------------------------
+FUNCTION TesteSystem()
+*-----------------------------------------------------------
+
+	? 'Inicio : ', DATETIME() 
+	kodnet = _screen.kodnet
+
+	*SET STEP ON 
+	*kodnet.loadAssembly("System.Private.CoreLib")
+	oDecimal = kodnet.getStaticWrapper("System.Decimal")
+	
+	? oDecimal	
 
 *-----------------------------------------------------------
 FUNCTION TesteDto()

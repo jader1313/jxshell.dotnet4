@@ -32,19 +32,14 @@ namespace jxshell.tests
         {
             //Arrenge
             var manager = new Manager();
-            manager.loadAssembly("System.Collections");
-            manager.loadAssembly("System.Runtime");
-            manager.loadAssembly("System.Private.CoreLib");
+            //manager.loadAssembly("System.Private.CoreLib");
             manager.init();
-            //manager.loadAssembly("System.Decimal");
-            //Assembly assemblyName = new();
+
             //Act
-            var systemDescinal = manager.getStaticWrapper("System.Decimal");
-            //var systemDescinal = Construct(manager, "System", "System.Decimal");
-            //var systemDescinal2 = Construct(assemblyName, "System", "Decimal");
+            var systemDecimal = manager.getStaticWrapper("System.Decimal");
 
             //Assert
-            Assert.NotNull(systemDescinal);
+            Assert.NotNull(systemDecimal);
         }
 
         [Fact]
